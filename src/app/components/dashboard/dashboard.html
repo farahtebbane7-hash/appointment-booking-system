@@ -1,0 +1,146 @@
+<div class="dashboard-container">
+  <mat-toolbar color="primary" class="toolbar">
+    <mat-icon class="brand-icon">dashboard</mat-icon>
+    <span>Dashboard</span>
+    <span class="spacer"></span>
+    <button mat-button routerLink="/providers" *ngIf="userRole === 'PATIENT'">
+      <mat-icon>people</mat-icon>
+      Providers
+    </button>
+    <button mat-button routerLink="/booking" *ngIf="userRole === 'PATIENT'">
+      <mat-icon>calendar_today</mat-icon>
+      Book Appointment
+    </button>
+    <button mat-button (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      Logout
+    </button>
+  </mat-toolbar>
+
+  <div class="content">
+    <div class="welcome-card">
+      <h1>Welcome, {{ userName }}!</h1>
+      <p>Role: {{ userRole }}</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <h3>Total Appointments</h3>
+          <div class="stat-number">{{ getTotalCount() }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <h3>Pending</h3>
+          <div class="stat-number">{{ getPendingCount() }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <h3>Confirmed</h3>
+          <div class="stat-number">{{ getConfirmedCount() }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <h3>Completed</h3>
+          <div class="stat-number">{{ getCompletedCount() }}</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Appointments List -->
+    <mat-card class="appointments-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>event_available</mat-icon>
+          My Appointments
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Loading State -->
+        <div *ngIf="loading" class="loading-spinner">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading appointments...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error" class="error-state">
+          <mat-icon>error</mat-icon>
+          <p>{{ error }}</p>
+          <button mat-raised-button color="primary" (click)="loadAppointments()">
+            Try Again
+          </button>
+        </div>
+
+        <!-- No Appointments -->
+        <div *ngIf="!loading && !error && appointments.length === 0" class="no-data">
+          <mat-icon>event_busy</mat-icon>
+          <p>No appointments found</p>
+          <button mat-raised-button color="primary" routerLink="/booking" *ngIf="userRole === 'PATIENT'">
+            Book Your First Appointment
+          </button>
+        </div>
+
+        <!-- Appointments List -->
+        <div *ngIf="!loading && !error && appointments.length > 0" class="appointments-list">
+          <div *ngFor="let appointment of appointments" class="appointment-item">
+            <div class="appointment-info">
+              <div class="appointment-date">
+                <mat-icon>event</mat-icon>
+                <strong>{{ appointment.date | date:'mediumDate' }}</strong> at {{ appointment.time }}
+              </div>
+              <div class="appointment-provider" *ngIf="userRole === 'PATIENT'">
+                <mat-icon>person</mat-icon>
+                Provider: {{ appointment.providerName }}
+              </div>
+              <div class="appointment-patient" *ngIf="userRole === 'PROVIDER'">
+                <mat-icon>person</mat-icon>
+                Patient: {{ appointment.patientName }}
+              </div>
+              <div class="appointment-notes" *ngIf="appointment.notes">
+                <mat-icon>description</mat-icon>
+                Reason: {{ appointment.notes }}
+              </div>
+              <span class="status-badge" [class]="getStatusClass(appointment.status)">
+                {{ appointment.status }}
+              </span>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="appointment-actions">
+              <!-- Provider: Confirm button -->
+              <button mat-raised-button color="primary" 
+                      *ngIf="userRole === 'PROVIDER' && appointment.status === 'PENDING'"
+                      (click)="confirmAppointment(appointment.id!)">
+                <mat-icon>check_circle</mat-icon>
+                Confirm
+              </button>
+              
+              <!-- Provider: Complete button -->
+              <button mat-raised-button color="accent" 
+                      *ngIf="userRole === 'PROVIDER' && appointment.status === 'CONFIRMED'"
+                      (click)="completeAppointment(appointment.id!)">
+                <mat-icon>done_all</mat-icon>
+                Complete
+              </button>
+              
+              <!-- Patient: Cancel button -->
+              <button mat-raised-button color="warn" 
+                      *ngIf="userRole === 'PATIENT' && (appointment.status === 'PENDING' || appointment.status === 'CONFIRMED')"
+                      (click)="cancelAppointment(appointment.id!)">
+                <mat-icon>cancel</mat-icon>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

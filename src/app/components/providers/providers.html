@@ -1,0 +1,72 @@
+<div class="page-wrapper">
+  <mat-toolbar color="primary" class="toolbar">
+    <button mat-icon-button routerLink="/dashboard">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <mat-icon class="brand-icon">people</mat-icon>
+    <span>Providers</span>
+    <span class="spacer"></span>
+    <button mat-button routerLink="/dashboard">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </button>
+  </mat-toolbar>
+
+  <div class="content">
+    <h1 class="page-title">Our Providers</h1>
+    <p class="page-subtitle">Find a healthcare provider and book your appointment</p>
+
+    <!-- Search Bar -->
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search providers</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput placeholder="Name or email..." [(ngModel)]="searchTerm" (input)="filterProviders()">
+    </mat-form-field>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading providers...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-state">
+      <mat-icon>error</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="loadProviders()">Try Again</button>
+    </div>
+
+    <!-- Providers Grid -->
+    <div *ngIf="!loading && !error" class="providers-grid">
+      <div *ngFor="let provider of filteredProviders" class="provider-card">
+        <div class="provider-avatar">
+          <mat-icon>person</mat-icon>
+        </div>
+        <div class="provider-info">
+          <h3>{{ provider.name }}</h3>
+          <p><mat-icon>email</mat-icon> {{ provider.email }}</p>
+          <p><mat-icon>phone</mat-icon> {{ provider.phone }}</p>
+        </div>
+        <div class="provider-actions">
+          <button 
+            *ngIf="isPatient()" 
+            mat-raised-button 
+            color="primary"
+            [routerLink]="['/booking']"
+            [queryParams]="{providerId: provider.id, providerName: provider.name}">
+            Book Appointment
+          </button>
+          <span *ngIf="!isPatient()" class="login-hint">
+            <mat-icon>info</mat-icon> Login as patient to book
+          </span>
+        </div>
+      </div>
+
+      <!-- No Results -->
+      <div *ngIf="filteredProviders.length === 0" class="no-results">
+        <mat-icon>search_off</mat-icon>
+        <p>No providers found matching "{{ searchTerm }}"</p>
+      </div>
+    </div>
+  </div>
+</div>
