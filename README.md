@@ -1,5 +1,4 @@
-# Navigate to your backend folder
-cd C:/Users/THINKPAD/Downloads/appointment
+
 
 # Create README file
 cat > README.md << 'EOF'
@@ -43,12 +42,5 @@ A full-stack appointment booking system built with **Spring Boot** and **Angular
 - MySQL 8+
 - Maven
 
-### Backend Setup
-```bash
-# Clone backend
-git clone -b main https://github.com/farahtebbane7-hash/appointment-booking-system.git
-cd appointment-booking-system
-
-# Configure MySQL in application.properties
 # Then run
 mvn spring-boot:run
