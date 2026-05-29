@@ -1,7 +1,5 @@
 
 
-# Create README file
-cat > README.md << 'EOF'
 # 📅 Appointment Booking System
 
 A full-stack appointment booking system built with **Spring Boot** and **Angular**.
